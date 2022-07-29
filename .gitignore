@@ -1,4 +1,5 @@
 application.properties
+/src/main/java/p2/revature/revworkboot
 target/
 pom.xml.tag
 pom.xml.releaseBackup
