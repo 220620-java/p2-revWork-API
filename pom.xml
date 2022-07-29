@@ -101,7 +101,7 @@
 						<configuration>
 							<inputSpec>${project.basedir}/src/main/resources/application.yaml</inputSpec>
 							<language>spring</language>
-							<output>${project.build.directory}/generated-sources/</output>
+							<output>${project.basedir}</output>
 							<generateSupportingFiles>false</generateSupportingFiles>
 							<apiPackage>p2.revature.revworkboot.api</apiPackage>
 							<modelPackage>p2.revature.revworkboot.models</modelPackage>
@@ -112,6 +112,7 @@
 					</execution>
 				</executions>
 			</plugin>
+
 
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
