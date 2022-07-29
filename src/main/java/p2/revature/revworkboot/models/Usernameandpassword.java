@@ -14,7 +14,7 @@ import javax.validation.constraints.*;
  */
 @ApiModel(description = "The onbject a user passes to login.")
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-07-28T18:48:17.110-05:00[America/Chicago]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-07-29T09:44:07.392-05:00[America/Chicago]")
 public class Usernameandpassword   {
   @JsonProperty("username")
   private String username = null;
