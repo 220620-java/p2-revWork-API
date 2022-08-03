@@ -1,5 +1,7 @@
 package p2.revature.revwork.utils;
 
+import java.io.UnsupportedEncodingException;
+
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
@@ -23,12 +25,28 @@ public class JwtUtil {
     	jwtVerifier = null;
     }
 	
-   public static String pullFromHeader(String headerString) {
-    	String arr = headerString.split("\\.")[1];
-
-    	new String(Base64.decodeBase64(arr));
-    	return arr;
+   public static String pullFromHeader(String headerString) throws UnsupportedEncodingException {
+    	String[] arr = headerString.split("\\.");
+    	String payload = arr[1];
+    	String jsonString = new String(Base64.decodeBase64(payload), "UTF-8");
+    	return jsonString;
     }
+   
+   public static int getId(String token) {
+	   
+	   Integer id = null;
+	   
+		try {
+			String[] split = JwtUtil.pullFromHeader(token).split(",");
+			String stringId = split[3].substring(5);
+			 id = Integer.parseInt(stringId); 
+
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return id;
+   }
 	
     @Bean
     @Scope("prototype")

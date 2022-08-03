@@ -1,5 +1,7 @@
 package p2.revature.revwork.controllers;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -52,7 +54,6 @@ public class LoginController implements LoginApi {
 			if (freelancer == null) {
 				return new ResponseEntity<>("Wrong username or passowrd", HttpStatus.BAD_REQUEST);
 			}
-
 			try {
 				JWTCreator.Builder builder = jwtUtil.getJwtBuilder();
 				Algorithm algorithm = Algorithm.HMAC256("michael");
@@ -60,6 +61,7 @@ public class LoginController implements LoginApi {
 				token = builder.withIssuer("auth0").withArrayClaim("roles", sa).withClaim("username", username)
 						.withClaim("fullname", freelancer.getName()).withClaim("id", freelancer.getId())
 						.sign(algorithm);
+				
 			} catch (JWTCreationException exception) {
 
 			}
@@ -68,20 +70,19 @@ public class LoginController implements LoginApi {
 			if (employer == null) {
 				return new ResponseEntity<>("Wrong username or password", HttpStatus.BAD_REQUEST);
 			}
-
 			try {
 				JWTCreator.Builder builder = jwtUtil.getJwtBuilder();
 				Algorithm algorithm = Algorithm.HMAC256("michael");
 				String[] sa = { "employer" };
 				token = builder.withIssuer("auth0").withArrayClaim("roles", sa).withClaim("username", username)
 						.withClaim("fullname", employer.getName()).withClaim("id", employer.getId()).sign(algorithm);
+				
 			} catch (JWTCreationException exception) {
 
 			}
 
 		}
-		  
-		return new ResponseEntity<>(JwtUtil.pullFromHeader(token) + "Token:"+ token , HttpStatus.OK);
+		return new ResponseEntity<>( "Token:"+ token , HttpStatus.OK);
 	}
 
 }

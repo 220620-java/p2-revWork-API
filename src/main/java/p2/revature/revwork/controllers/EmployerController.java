@@ -46,7 +46,7 @@ public class EmployerController implements RegisterApi {
 		this.ojs = ojs;
 		this.empServ = empServ;
 		this.aps = aps;
-		this.jwt =jwt;
+		this.jwt = jwt;
 	}
 
 	@GetMapping(path = "/get_jobs")
@@ -70,15 +70,15 @@ public class EmployerController implements RegisterApi {
 	public ResponseEntity<List<Availablejob>> jobGetById(@PathVariable Integer id) {
 		OpenJobs open = ojs.findById(id);
 		List<Availablejob> aj = new ArrayList<>();
-			Availablejob a = new Availablejob();
-			a.setId(open.getId());
-			a.setEmployerid(EmployerData.toEmployer(open.getEmployer()));
-			a.setName(open.getName());
-			a.setDescription(open.getDescription());
-			a.setSkills(open.getSkills());
-			a.setPayrate(open.getPayrate());
-			aj.add(a);
-		
+		Availablejob a = new Availablejob();
+		a.setId(open.getId());
+		a.setEmployerid(EmployerData.toEmployer(open.getEmployer()));
+		a.setName(open.getName());
+		a.setDescription(open.getDescription());
+		a.setSkills(open.getSkills());
+		a.setPayrate(open.getPayrate());
+		aj.add(a);
+
 		return ResponseEntity.ok(aj);
 	}
 
@@ -115,36 +115,55 @@ public class EmployerController implements RegisterApi {
 	}
 
 	@PostMapping(path = "/add_job")
-	public ResponseEntity<Availablejob> addJob(@RequestBody Availablejob aj){
-			//@RequestHeader(value = "Authorization", required = true) String authorization) {
-		// would need the employerID already for comparasion and authorization.
-		//String token  = JwtUtil.pullFromHeader(authorization);
+	public ResponseEntity<Availablejob> addJob(@RequestBody Availablejob aj, @RequestHeader(value = "Authorization", required = true) String authorization) {
+		int id = JwtUtil.getId(authorization);
 		
-		//if(token == aj.getEmployerid()))
-		
+		if(id == aj.getEmployerid().getId()) {
 		OpenJobs open = new OpenJobs(aj.getId(), empServ.findById(aj.getEmployerid().getId()), aj.getName(), aj.getDescription(), aj.getSkills(),
 				aj.getPayrate());
 		ojs.addJob(open);
+		
 		return ResponseEntity.status(HttpStatus.CREATED).body(aj);
+		
+		} else {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+		}
 	}
 
 	@DeleteMapping(path = "/delete_job")
-	public ResponseEntity<Availablejob> deleteJob(@RequestBody Availablejob openJob) {
-		OpenJobs open = new OpenJobs(openJob.getId(), EmployerData.fromEmployer(openJob.getEmployerid()), openJob.getName(),
-				openJob.getDescription(), openJob.getSkills(), openJob.getPayrate());
+	public ResponseEntity<Availablejob> deleteJob(@RequestBody Availablejob openJob, @RequestHeader(value = "Authorization", required = true) String authorization) {
+		
+		int id = JwtUtil.getId(authorization);
+
+		if(id == openJob.getEmployerid().getId()) {
+
+		OpenJobs open = new OpenJobs(openJob.getId(), EmployerData.fromEmployer(openJob.getEmployerid()),
+				openJob.getName(), openJob.getDescription(), openJob.getSkills(), openJob.getPayrate());
 		ojs.deleteJob(open);
 		return ResponseEntity.status(HttpStatus.GONE).body(openJob);
+		
+		} else {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+		}
 	}
 
 	@PutMapping(path = "/edit_job")
-	public ResponseEntity<Availablejob> editJob(@RequestBody Availablejob aj) {
-		OpenJobs open = new OpenJobs(aj.getId(), EmployerData.fromEmployer(aj.getEmployerid()), aj.getName(), aj.getDescription(), aj.getSkills(),
-				aj.getPayrate());
+	public ResponseEntity<Availablejob> editJob(@RequestBody Availablejob aj, @RequestHeader(value = "Authorization", required = true) String authorization) {
+		
+		int id = JwtUtil.getId(authorization);
+
+		if(id == aj.getEmployerid().getId()) {
+
+		OpenJobs open = new OpenJobs(aj.getId(), EmployerData.fromEmployer(aj.getEmployerid()), aj.getName(),
+				aj.getDescription(), aj.getSkills(), aj.getPayrate());
 		if (ojs.editJob(open) != null) {
 			return ResponseEntity.status(HttpStatus.OK).body(aj);
 		} else {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(aj);
 		}
+	} else {
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+	}
 	}
 
 	@Override
@@ -154,4 +173,3 @@ public class EmployerController implements RegisterApi {
 	}
 
 }
-
