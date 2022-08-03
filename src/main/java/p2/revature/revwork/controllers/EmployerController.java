@@ -13,15 +13,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import p2.revature.revwork.models.data.Application;
+import p2.revature.revwork.models.data.JobApplication;
 import p2.revature.revwork.models.data.EmployerData;
 import p2.revature.revwork.models.data.OpenJobs;
-import p2.revature.revwork.services.ApplicationService;
+import p2.revature.revwork.services.JobApplicationService;
 import p2.revature.revwork.services.EmployerService;
 import p2.revature.revwork.services.OpenJobsService;
+import p2.revature.revwork.utils.JwtUtil;
 import p2.revature.revworkboot.api.RegisterApi;
 import p2.revature.revworkboot.models.Availablejob;
 import p2.revature.revworkboot.models.Employerregister;
@@ -33,16 +35,18 @@ public class EmployerController implements RegisterApi {
 
 	private EmployerService empServ;
 	private OpenJobsService ojs;
-	private ApplicationService aps;
+	private JobApplicationService aps;
+	private JwtUtil jwt;
 
 	// Did = GetJobs + FindJobbyID+ AddJob + Delete Job + edit Job + Register
 	// Need to do = Login/Logout + Select Application + ID Validation with JWT for
 	// editing and deleting jobs
 
-	public EmployerController(EmployerService empServ, OpenJobsService ojs, ApplicationService aps) {
+	public EmployerController(EmployerService empServ, OpenJobsService ojs, JobApplicationService aps, JwtUtil jwt) {
 		this.ojs = ojs;
 		this.empServ = empServ;
 		this.aps = aps;
+		this.jwt =jwt;
 	}
 
 	@GetMapping(path = "/get_jobs")
@@ -52,7 +56,7 @@ public class EmployerController implements RegisterApi {
 		for (OpenJobs o : open) {
 			Availablejob a = new Availablejob();
 			a.setId(o.getId());
-			a.setEmployerid(EmployerData.toEmployer(  o.getEmployer()));
+			a.setEmployerid(EmployerData.toEmployer(o.getEmployer()));
 			a.setName(o.getName());
 			a.setDescription(o.getDescription());
 			a.setSkills(o.getSkills());
@@ -64,24 +68,23 @@ public class EmployerController implements RegisterApi {
 
 	@GetMapping(path = "/{id}")
 	public ResponseEntity<List<Availablejob>> jobGetById(@PathVariable Integer id) {
-		List<OpenJobs> open = ojs.findById(id);
+		OpenJobs open = ojs.findById(id);
 		List<Availablejob> aj = new ArrayList<>();
-		for (OpenJobs o : open) {
 			Availablejob a = new Availablejob();
-			a.setId(o.getId());
-			a.setEmployerid( EmployerData.toEmployer( o.getEmployer()));
-			a.setName(o.getName());
-			a.setDescription(o.getDescription());
-			a.setSkills(o.getSkills());
-			a.setPayrate(o.getPayrate());
+			a.setId(open.getId());
+			a.setEmployerid(EmployerData.toEmployer(open.getEmployer()));
+			a.setName(open.getName());
+			a.setDescription(open.getDescription());
+			a.setSkills(open.getSkills());
+			a.setPayrate(open.getPayrate());
 			aj.add(a);
-		}
+		
 		return ResponseEntity.ok(aj);
 	}
 
 	@GetMapping(path = "/get_applicants/{name}")
-	public ResponseEntity<List<Application>> getApplicantsByName(@PathVariable String name) {
-		List<Application> list = aps.selectApplicants(name);
+	public ResponseEntity<List<JobApplication>> getApplicantsByName(@PathVariable String name) {
+		List<JobApplication> list = aps.selectApplicants(name);
 		if (list.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		} else {
@@ -90,8 +93,8 @@ public class EmployerController implements RegisterApi {
 	}
 
 	@GetMapping(path = "/applicant/{id}")
-	public ResponseEntity<Application> getApplicantsById(@PathVariable int id) {
-		Application list = aps.selectApplicant(id);
+	public ResponseEntity<JobApplication> getApplicantsById(@PathVariable int id) {
+		JobApplication list = aps.selectApplicant(id);
 		if (list.getId() < 1 || list.getClass().equals(null)) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		} else {
@@ -112,9 +115,15 @@ public class EmployerController implements RegisterApi {
 	}
 
 	@PostMapping(path = "/add_job")
-	public ResponseEntity<Availablejob> addJob(@RequestBody Availablejob aj) {
-		OpenJobs open = new OpenJobs(EmployerData.fromEmployer(aj.getEmployerid()), aj.getName(), aj.getDescription(), aj.getSkills(),
-				aj.getPayrate(), aj.isIstaken());
+	public ResponseEntity<Availablejob> addJob(@RequestBody Availablejob aj){
+			//@RequestHeader(value = "Authorization", required = true) String authorization) {
+		// would need the employerID already for comparasion and authorization.
+		//String token  = JwtUtil.pullFromHeader(authorization);
+		
+		//if(token == aj.getEmployerid()))
+		
+		OpenJobs open = new OpenJobs(aj.getId(), empServ.findById(aj.getEmployerid().getId()), aj.getName(), aj.getDescription(), aj.getSkills(),
+				aj.getPayrate());
 		ojs.addJob(open);
 		return ResponseEntity.status(HttpStatus.CREATED).body(aj);
 	}
@@ -122,7 +131,7 @@ public class EmployerController implements RegisterApi {
 	@DeleteMapping(path = "/delete_job")
 	public ResponseEntity<Availablejob> deleteJob(@RequestBody Availablejob openJob) {
 		OpenJobs open = new OpenJobs(openJob.getId(), EmployerData.fromEmployer(openJob.getEmployerid()), openJob.getName(),
-				openJob.getDescription(), openJob.getSkills(), openJob.getPayrate(),openJob.isIstaken());
+				openJob.getDescription(), openJob.getSkills(), openJob.getPayrate());
 		ojs.deleteJob(open);
 		return ResponseEntity.status(HttpStatus.GONE).body(openJob);
 	}
@@ -130,7 +139,7 @@ public class EmployerController implements RegisterApi {
 	@PutMapping(path = "/edit_job")
 	public ResponseEntity<Availablejob> editJob(@RequestBody Availablejob aj) {
 		OpenJobs open = new OpenJobs(aj.getId(), EmployerData.fromEmployer(aj.getEmployerid()), aj.getName(), aj.getDescription(), aj.getSkills(),
-				aj.getPayrate(), aj.isIstaken());
+				aj.getPayrate());
 		if (ojs.editJob(open) != null) {
 			return ResponseEntity.status(HttpStatus.OK).body(aj);
 		} else {
@@ -145,3 +154,4 @@ public class EmployerController implements RegisterApi {
 	}
 
 }
+

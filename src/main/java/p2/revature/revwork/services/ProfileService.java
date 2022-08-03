@@ -31,12 +31,16 @@ public class ProfileService {
 	}
 
 	public Profile editProfile(Profile profile) {
-		if (pr.findById(profile.getId()).isPresent()) {
+		if (pr.findById(profile.getId()) != null) {
 			pr.save(profile);
 			return profile;
 		} else {
 			return null;
 		}
+	}
+	
+	public Profile findById(int id) {
+		return pr.findById(id);
 	}
 
 }

@@ -9,27 +9,30 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import p2.revature.revworkboot.models.Availablejob;
+import p2.revature.revworkboot.models.Freelancer;
+
 @Entity
 @Table(name = "application")
-public class Application {
+public class JobApplication {
 
 	@Id // specifies that this field is the primary key
 	@GeneratedValue(strategy = GenerationType.IDENTITY) // specifies that the db generates this value
 	private int id;
 	@ManyToOne
-	@JoinColumn(name = "jobid")
+	@JoinColumn(name = "jobid", referencedColumnName = "id")
 	private OpenJobs openJob;
 	@ManyToOne
-	@JoinColumn(name = "profileid")
+	@JoinColumn(name = "profileid", referencedColumnName = "id")
 	private Profile profile;
 	private String coverletter;
 	private String name;
 
-	public Application() {
+	public JobApplication() {
 		super();
 	}
 
-	public Application(OpenJobs openJob, Profile profile, String coverletter, String name) {
+	public JobApplication(OpenJobs openJob, Profile profile, String coverletter, String name) {
 		super();
 		this.openJob = openJob;
 		this.profile = profile;
@@ -37,7 +40,7 @@ public class Application {
 		this.name = name;
 	}
 
-	public Application(int id, OpenJobs openJob, Profile profile, String coverletter, String name) {
+	public JobApplication(int id, OpenJobs openJob, Profile profile, String coverletter, String name) {
 		super();
 		this.id = id;
 		this.openJob = openJob;
@@ -46,6 +49,7 @@ public class Application {
 		this.name = name;
 	}
 
+	
 	public String getName() {
 		return name;
 	}
@@ -88,11 +92,9 @@ public class Application {
 
 	@Override
 	public String toString() {
-		return "Application [id=" + id + ", openJob=" + openJob + ", profile=" + profile + ", coverletter="
+		return "JobApplication [id=" + id + ", openJob=" + openJob + ", profile=" + profile + ", coverletter="
 				+ coverletter + ", name=" + name + "]";
 	}
-
-	
 
 	
 

@@ -47,7 +47,7 @@ public class JobController implements JobApi {
 			a.setName(o.getName());
 			a.setDescription(o.getDescription());
 			a.setSkills(o.getSkills());
-			a.setPayrate(o.getPayrate());
+			a.setPayrate(o.getPayrate());			
 			aj.add(a);
 		}
 		return ResponseEntity.ok(aj);
@@ -56,24 +56,23 @@ public class JobController implements JobApi {
 	// employerID is null
 	@GetMapping(path = "/{id}")
 	public ResponseEntity<List<Availablejob>> jobGetById(@Valid Availablejob body) {
-		List<OpenJobs> open = oj.findById(body.getId());
+		OpenJobs open = oj.findById(body.getId());
 		List<Availablejob> aj = new ArrayList<>();
-		for (OpenJobs o : open) {
 			Availablejob a = new Availablejob();
-			a.setId(o.getId());
-			a.setEmployerid(EmployerData.toEmployer(o.getEmployer()));
-			a.setName(o.getName());
-			a.setDescription(o.getDescription());
-			a.setSkills(o.getSkills());
-			a.setPayrate(o.getPayrate());
+			a.setId(open.getId());
+			a.setEmployerid(EmployerData.toEmployer(open.getEmployer()));
+			a.setName(open.getName());
+			a.setDescription(open.getDescription());
+			a.setSkills(open.getSkills());
+			a.setPayrate(open.getPayrate());
 			aj.add(a);
-		}
+		
 		return ResponseEntity.ok(aj);
 	}
 
 	@PostMapping
 	public ResponseEntity<Availablejob> postJob(@RequestBody Availablejob openJob) {
-		OpenJobs open = new OpenJobs(EmployerData.fromEmployer(openJob.getEmployerid()),openJob.getName(), openJob.getDescription(), openJob.getSkills(), openJob.getPayrate(), openJob.isIstaken());
+		OpenJobs open = new OpenJobs(openJob.getId(), EmployerData.fromEmployer(openJob.getEmployerid()),openJob.getName(), openJob.getDescription(), openJob.getSkills(), openJob.getPayrate());
 		oj.addJob(open);
 		return ResponseEntity.status(HttpStatus.CREATED).body(openJob);
 	}
@@ -86,12 +85,11 @@ public class JobController implements JobApi {
 	
 	@DeleteMapping
 	public ResponseEntity<Availablejob> deleteJob(@RequestBody Availablejob openJob){
-		OpenJobs open = new OpenJobs(EmployerData.fromEmployer(openJob.getEmployerid()),openJob.getName(), openJob.getDescription(), openJob.getSkills(), openJob.getPayrate(), openJob.isIstaken());
+		OpenJobs open = new OpenJobs( openJob.getId(), EmployerData.fromEmployer(openJob.getEmployerid()),openJob.getName(), openJob.getDescription(), openJob.getSkills(), openJob.getPayrate());
 		oj.deleteJob(open);
 		return ResponseEntity.status(HttpStatus.GONE).body(openJob);		
 	}
 
 
 }
-
 

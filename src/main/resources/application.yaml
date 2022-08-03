@@ -20,7 +20,7 @@ paths:
                                 type: string
                             examples:
                                 Login Token Example:
-                                    value: xxx.yyyy.zzzz              
+                                    value: xxx.yyyy.zzzz
                     description: The login was a sucess.
     /job:
         get:
@@ -119,15 +119,20 @@ components:
             required:
                 - password
                 - username
+                - role
             type: object
             properties:
                 username:
                     type: string
                 password:
                     type: string
+                role:
+                    description: Freelancer Or Employer
+                    type: string
             example:
                 username: string
                 password: string
+                role: string
         availablejob:
             title: Root Type for availablejob
             description: A job the employer is trying to find a freelancer to complete.
@@ -160,21 +165,6 @@ components:
                     "payrate": "double"
                     "istaken" : boolean
                 }
-        application:
-            title: Root Type for application
-            description: ''
-            type: object
-            properties:
-                jobid:
-                    type: string
-                portfolioid:
-                    type: string
-                coverletter:
-                    type: string
-            example:
-                jobid: integer
-                portfolioid: integer
-                coverletter: string
         employerregister:
             title: Root Type for employerregister
             description: ''
@@ -231,7 +221,7 @@ components:
             type: object
             properties:
                 id:
-                    type: string
+                    type: integer
                 name:
                     type: string
                 email:
@@ -298,6 +288,29 @@ components:
                 email: string
                 skills: string
                 college: string
+        application:
+            title: Root Type for application
+            description: ''
+            type: object
+            properties:
+                jobid:
+                    $ref: '#/components/schemas/availablejob'
+                portfolioid:
+                    $ref: '#/components/schemas/portfolio'
+                coverletter:
+                    type: string
+                name:
+                    description: ''
+                    type: string
+                id:
+                    description: ''
+                    type: integer
+            example:
+                id: integer
+                jobid: availablejob
+                portfolioid: portfolio
+                coverletter: string
+                name: string
     securitySchemes:
         revwork_security_schema:
             scheme: bearer

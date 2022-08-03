@@ -10,7 +10,7 @@ import p2.revature.revworkboot.models.Availablejob;
 
 @Repository
 public interface OpenJobRepository extends JpaRepository<OpenJobs, Integer>{
-	public List<OpenJobs> findById(int id);	
 	
+	public OpenJobs findById(int id);
 }
 

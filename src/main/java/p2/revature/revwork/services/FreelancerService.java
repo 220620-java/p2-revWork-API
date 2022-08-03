@@ -23,12 +23,7 @@ public class FreelancerService {
 		return fr.findAll();
 	}
 	
-	/**
-	 * Try to see if there  
-	 * 
-	 * @param login
-	 * @return r
-	 */
+	
 	public FreelancerData verifyLogin(Usernameandpassword login) {
 		List<FreelancerData> free = fr.findByUsername(login.getUsername());
 		if (free.size() == 0) {
@@ -67,3 +62,4 @@ public class FreelancerService {
 	
 
 }
+

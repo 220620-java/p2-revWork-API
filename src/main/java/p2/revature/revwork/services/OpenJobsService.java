@@ -25,7 +25,7 @@ public class OpenJobsService {
 		return oj.findAll();
 	}
 
-	public List<OpenJobs> findById(int integer) {
+	public OpenJobs findById(int integer) {
 		// get id
 		return oj.findById(integer);
 	}
@@ -59,4 +59,3 @@ public class OpenJobsService {
 	}
 
 }
-

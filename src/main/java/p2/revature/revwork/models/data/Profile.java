@@ -10,6 +10,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.Valid;
 
+import p2.revature.revworkboot.models.Availablejob;
+import p2.revature.revworkboot.models.Portfolio;
+
 @Entity
 @Table(name = "profiles")
 public class Profile {
@@ -18,7 +21,7 @@ public class Profile {
 	@GeneratedValue(strategy = GenerationType.IDENTITY) // specifies that the db generates this value
 	private int id;
 	@ManyToOne
-	@JoinColumn(name = "freelancerid")
+	@JoinColumn(name = "freelancerid", referencedColumnName = "id")
 	private FreelancerData freelancer;
 	private String college;
 	private String name;
@@ -37,12 +40,18 @@ public class Profile {
 		this.email = email;
 	}
 
-	public Profile(FreelancerData freelancer, String college, String name, String email) {
-		super();
-		this.freelancer = freelancer;
-		this.college = college;
-		this.name = name;
-		this.email = email;
+	
+	public static Profile fromPortfolio(Portfolio p) {
+		FreelancerData fd = new FreelancerData();
+		System.out.println(p.getId());
+		fd.setId(p.getId());
+		Profile prof = new Profile();
+		prof.setId(p.getId());
+		prof.setFreelancer(fd);
+		prof.setCollege(p.getCollege());
+		prof.setName(p.getName());
+		prof.setEmail(p.getEmail());
+		return prof;
 	}
 
 	public String getCollege() {

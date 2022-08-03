@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import p2.revature.revwork.data.EmployerRepository;
 import p2.revature.revwork.data.OpenJobRepository;
 import p2.revature.revwork.models.data.EmployerData;
+import p2.revature.revwork.models.data.FreelancerData;
 import p2.revature.revwork.models.data.OpenJobs;
 import p2.revature.revworkboot.models.Availablejob;
 import p2.revature.revworkboot.models.Employer;
@@ -28,8 +29,25 @@ public class EmployerService {
 		return er.findAll();
 	}
 
-	boolean verifyLogin(Usernameandpassword login) {
-		return true;
+	public EmployerData findById(int id) {
+		return er.findById(id);
+	}
+	
+	
+	public EmployerData verifyLogin(Usernameandpassword login) {
+		List<EmployerData> emp = er.findByUsername(login.getUsername());
+		if (emp.size() == 0) {
+			return null;
+		} else {
+			EmployerData employer = emp.get(0);
+			
+			if ( employer.getPassword().equals(login.getPassword()) ) {
+				return employer;
+			}
+			else {
+				return null;
+			}
+		}
 	}
 
 	public boolean verifyRigistration(Employerregister register) {
@@ -56,7 +74,7 @@ public class EmployerService {
 		// Get employerID should actually be getEmployer( ) in the AvaliableJob API i think
 		// Ill try this later 
 		//OpenJobs open = new OpenJobs(openJob.getEmployerid(),openJob.getName(), openJob.getDescription(), openJob.getSkills(), openJob.getPayrate());
-		OpenJobs open = new OpenJobs(EmployerData.fromEmployer(openJob.getEmployerid()),openJob.getName(), openJob.getDescription(),openJob.getSkills(), openJob.getPayrate(), openJob.isIstaken());
+		OpenJobs open = new OpenJobs(openJob.getId(), EmployerData.fromEmployer(openJob.getEmployerid()),openJob.getName(), openJob.getDescription(),openJob.getSkills(), openJob.getPayrate());
 		oj.save(open);
 		return openJob;
 	}

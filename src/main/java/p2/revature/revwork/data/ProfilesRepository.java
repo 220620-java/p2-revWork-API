@@ -7,5 +7,6 @@ import p2.revature.revwork.models.data.Profile;
 
 @Repository
 public interface ProfilesRepository extends JpaRepository<Profile, Integer> {
-
+	
+public Profile findById(int id);
 }
